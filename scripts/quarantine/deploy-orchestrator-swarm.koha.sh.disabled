@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# QUARANTINED: legacy Koha deployment template retained only for pattern review.
+# Task 5.2 must replace it with a narrowly scoped SMTP2Graph orchestrator.
+printf '%s\n' 'ERROR: quarantined Koha deployment template must not be executed.' >&2
+exit 78
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 

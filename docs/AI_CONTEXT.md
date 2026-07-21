@@ -12,7 +12,7 @@ The planned initial gateway candidate is SMTP2Graph. This is not yet an accepted
 - `docs/SPEC.md` defines the approved requirements baseline.
 - `docs/ROADMAP.md` defines the implementation sequence, quality gates, and acceptance work.
 - `docs/AI_CONTEXT.md` is the compact entry point for future agents.
-- Existing GitHub workflow and deployment script contain Koha-specific template assumptions. Do not treat them as SMTP2Graph-ready or execute them for this project; replace or adapt them only through a reviewed roadmap task.
+- Task 1.1 inventory is complete. The Koha-derived GitHub workflow and deployment script are quarantined outside their executable paths and are not SMTP2Graph-ready. They may be replaced or selectively adapted only through a reviewed roadmap task.
 
 ## Key Decisions
 
@@ -71,12 +71,24 @@ docs/
   ROADMAP.md       # implementation plan and gates
   AI_CONTEXT.md    # this compact context
 scripts/
-  deploy-orchestrator-swarm.sh  # legacy Koha-derived template; not ready to run
-.github/workflows/
-  main.yml         # legacy Koha-derived CI/CD template; not ready to run
+  quarantine/
+    deploy-orchestrator-swarm.koha.sh.disabled  # non-executable, fail-closed legacy template
+.github/quarantine/
+  main.koha.yml.disabled  # outside the GitHub Actions workflow discovery path
 ```
 
 Expected future paths are defined in the roadmap: `deploy/swarm/`, `deploy/config/`, `deploy/monitoring/`, `tests/`, `docs/adr/`, `docs/RUNBOOK.md`, `docs/TEST_PLAN.md`, and `docs/scripts_runbook.md`.
+
+## Initial Template Inventory
+
+| Asset | Decision | Rationale and reusable scope |
+|---|---|---|
+| `.github/quarantine/main.koha.yml.disabled` | Replace | Unsafe as an SMTP2Graph workflow: it had automatic deployment triggers, Koha/Ansible inputs, broad secret forwarding, and a reusable workflow pinned to mutable `@main`. Environment separation and the reusable-workflow concept may be reconsidered later with immutable pins and least privilege. |
+| `scripts/quarantine/deploy-orchestrator-swarm.koha.sh.disabled` | Replace | Unsafe as an SMTP2Graph orchestrator: it contains Koha/MariaDB volume assumptions, missing local dependencies, and active Docker Swarm mutation paths. Repository-root resolution, strict Bash mode, cleanup traps, and staged validation are patterns to adapt only after review. |
+| `docs/hello-world.md` | Remove | Ignored local prompt scratchpad, not project documentation. Removal is deferred because the working tree already contains a user change. |
+| `.gitignore` | Keep | Correctly keeps the local prompt scratchpad out of future commits; extend it only as real generated or secret-bearing paths are introduced. |
+
+The runtime-mounted `.agents/` and `.codex/` directories are empty environment artifacts, not tracked project templates. Git metadata is outside the template inventory.
 
 ## Important Documents
 
@@ -124,4 +136,4 @@ If this file conflicts with `docs/SPEC.md`, `docs/ROADMAP.md`, or an applicable 
 
 ## Last Updated
 
-2026-07-21 — Created from the current `docs/SPEC.md` and `docs/ROADMAP.md` planning baseline. Update after an accepted ADR, Gate decision, completed milestone, or material stack/security change.
+2026-07-21 — Updated after Task 1.1 inventory and fail-closed quarantine of the Koha-derived deployment assets.
