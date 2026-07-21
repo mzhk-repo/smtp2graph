@@ -4,4 +4,5 @@
 
 - `CHANGELOG.md` + активний том у `docs/changelogs` заповнюй згідно з твоєю системною інструкцією
 - docs/AI_CONTEXT.md
+- docs/ROADMAP.md (прочитатай початок 1-222 рядок, phase 1 224-323, кінець від 906)
 
