@@ -48,7 +48,7 @@ The target queue is durable but bounded to 1 GiB. At 80% utilization, new SMTP s
 
 ## Tech Stack
 
-- Gateway candidate: SMTP2Graph, exact version and digest pending Gate B.
+- Gateway qualification candidate: SMTP2Graph v1.1.5, immutable digest recorded in `deploy/config/gateway-version.md`; Gate B remains open because scan, SBOM and runtime compatibility evidence is incomplete.
 - Runtime/orchestration: Docker Swarm, single node, one service replica.
 - Secrets: Docker Secrets, SOPS + age.
 - Identity and mail delivery: Microsoft Entra ID, Microsoft Graph, Exchange Online RBAC for Applications.
@@ -146,7 +146,7 @@ If this file conflicts with `docs/SPEC.md`, `docs/ROADMAP.md`, or an applicable 
 
 ## Open Questions
 
-- Which exact SMTP2Graph release and immutable digest pass Gate B? See [ADR-0002](adr/ADR-0002-select-smtp2graph-as-initial-gateway.md).
+- Does SMTP2Graph v1.1.5 pass Gate B after scan, SBOM and runtime qualification? See [ADR-0002](adr/ADR-0002-select-smtp2graph-as-initial-gateway.md) and [gateway-version.md](../deploy/config/gateway-version.md).
 - Does that release safely support certificate-file authentication and a tmpfs-rendered runtime configuration?
 - What are its exact SMTP acknowledgement, durable queue, `Retry-After`, dead-letter, and downgrade compatibility semantics?
 - What TLS certificate source and trust model will clients use?
@@ -157,4 +157,4 @@ If this file conflicts with `docs/SPEC.md`, `docs/ROADMAP.md`, or an applicable 
 
 ## Last Updated
 
-2026-07-22 — Updated after Task 2.1 created the ADR baseline; ADR-0002 remains Proposed pending Gate B qualification.
+2026-07-22 — Updated after Task 2.2 recorded SMTP2Graph v1.1.5 as a pinned qualification candidate; ADR-0002 remains Proposed pending Gate B evidence.

@@ -43,7 +43,7 @@ Machine-checkable ключі визначені у [`deploy/config/env-contract.
 make verify-env
 ```
 
-Contract є experimental до Gate B. Image digest, SMTP2Graph upstream keys, runtime render paths і production recipient policy буде визначено тільки після кваліфікації кандидата.
+Contract є experimental до Gate B. Qualification candidate version/digest зафіксовано в [`deploy/config/gateway-version.md`](deploy/config/gateway-version.md), але SMTP2Graph upstream keys, runtime render paths і production recipient policy буде визначено тільки після повної кваліфікації кандидата.
 
 ## Deployment safety
 

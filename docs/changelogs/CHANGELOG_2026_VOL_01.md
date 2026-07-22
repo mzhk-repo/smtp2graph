@@ -50,3 +50,10 @@ Rollback:
     Verification: Перевірено ADR sections, синхронізацію з AI_CONTEXT, Markdown lint і `git diff --check`.
     Risks: Production onboarding потребуватиме створення та окремого lifecycle для кількох mailbox identities.
     Rollback: MVP policy залишається доступною як тимчасовий режим; production mailbox model змінюється лише окремим superseding ADR.
+
+2026-07-22 — Task 2.2: pinned SMTP2Graph qualification candidate
+    Context: Gate B потребував exact release, immutable image digest і supply-chain evidence до runtime qualification.
+    Change: Зафіксовано SMTP2Graph v1.1.5 та multi-platform digest у `deploy/config/gateway-version.md`; додано registry/release metadata, license note, platform manifests і qualification status. ADR-0002 залишається Proposed.
+    Verification: Registry manifest inspection, digest-pinned pull, image metadata review, upstream release/Dockerfile review і repository validation виконані; Trivy/Syft/Cosign evidence ще не отримано.
+    Risks: Відсутність vulnerability scan, SBOM/signature verification і non-root evidence блокує Gate B та production use.
+    Rollback: Видалити candidate artifact і повернути ADR-0002 до стану без pinned candidate; production runtime не змінювався.

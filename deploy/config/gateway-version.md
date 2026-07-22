@@ -1,0 +1,52 @@
+# SMTP2Graph qualification candidate
+
+**Status:** Qualification incomplete; do not use for production deployment.
+**Date:** 2026-07-22
+**Related:** [ADR-0002](../../docs/adr/ADR-0002-select-smtp2graph-as-initial-gateway.md), Roadmap Tasks 2.2–2.5, Gate B
+
+## Candidate
+
+| Field | Value |
+|---|---|
+| Upstream repository | [`SMTP2Graph/SMTP2Graph`](https://github.com/SMTP2Graph/SMTP2Graph) |
+| Source release | [`v1.1.5`](https://github.com/SMTP2Graph/SMTP2Graph/releases/tag/v1.1.5) |
+| Image repository | `docker.io/smtp2graph/smtp2graph` |
+| Immutable multi-platform reference | `docker.io/smtp2graph/smtp2graph@sha256:88ef2015f37ad460d7cc06fa80cf82a0318108ae696dac61a2896d5016d9545d` |
+| Linux amd64 manifest | `sha256:099b9a2807bf79572821bb6dd01ab196b3387dcc4b0524a5387d8d2f460f8b08` |
+| Linux arm64 manifest | `sha256:1fc2c500f58efcdd0e1a2f7c361d94c37b6b5d7014a92f8710a1612bee1d523a` |
+| License | GPL-3.0, according to upstream repository metadata |
+
+The digest was resolved from the Docker Registry manifest and then pulled by digest. The local amd64 image reported the same repository digest and image ID `sha256:3b6a42d721972d13eaabf23c3313dae5c40ae449fe187ae732bc77b3c10a3b2f`.
+
+## Evidence collected
+
+- GitHub identifies `v1.1.5` as the latest release, published on 2026-05-03. Its release notes include fixes for graceful container stop, file rename handling and multiple messages on one connection.
+- The registry exposes amd64 and arm64 manifests plus OCI attestation manifests for the two platform manifests.
+- The upstream Dockerfile uses `node:20-alpine`, exposes TCP/587, declares `/data` as a volume and starts `/bin/sh -c startup.sh`.
+- Local image metadata reports `Created=2026-05-03T11:20:50.91496843Z`, `Architecture=amd64`, and no configured non-root `User`.
+
+## Qualification status
+
+| Check | Result | Evidence / blocker |
+|---|---|---|
+| Exact version and digest | Pass | Registry manifest inspection and digest-pinned pull |
+| Source/release identity | Preliminary pass | Upstream repository and tagged release identified; build provenance requires final review |
+| License | Preliminary pass | GPL-3.0 metadata found; project compatibility review remains required |
+| Image architecture | Pass for amd64/arm64 | Both platform manifests are present |
+| Image signature verification | Pending | `cosign` is not installed; no signature verification result recorded |
+| Vulnerability scan | Pending | `trivy` is not installed; no severity result recorded |
+| SBOM | Pending | `syft` is not installed; no immutable SBOM artifact recorded |
+| Non-root compatibility | Blocked/pending Task 2.3 | Image metadata has no configured `USER`; runtime behavior is not qualified |
+| Gate B | Not passed | Tasks 2.3–2.5 and security review remain outstanding |
+
+## Safe reproduction commands
+
+```bash
+docker buildx imagetools inspect docker.io/smtp2graph/smtp2graph:v1.1.5
+docker pull docker.io/smtp2graph/smtp2graph@sha256:88ef2015f37ad460d7cc06fa80cf82a0318108ae696dac61a2896d5016d9545d
+docker image inspect docker.io/smtp2graph/smtp2graph@sha256:88ef2015f37ad460d7cc06fa80cf82a0318108ae696dac61a2896d5016d9545d
+trivy image --severity HIGH,CRITICAL --exit-code 1 docker.io/smtp2graph/smtp2graph@sha256:88ef2015f37ad460d7cc06fa80cf82a0318108ae696dac61a2896d5016d9545d
+syft docker.io/smtp2graph/smtp2graph@sha256:88ef2015f37ad460d7cc06fa80cf82a0318108ae696dac61a2896d5016d9545d -o cyclonedx-json
+```
+
+The last three commands are intentionally not recorded as successful: the local environment lacks Trivy and Syft, and the inspect command must be run with access to the Docker daemon. The image reference in this file is a qualification candidate, not an approved production deployment reference.
