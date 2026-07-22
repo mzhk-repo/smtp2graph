@@ -1,0 +1,24 @@
+# key|required|classification|safe-example-value
+CONFIG_CONTRACT_VERSION|required|public|experimental-v1
+DEPLOY_ENVIRONMENT|required|public|development
+SMTP_BIND_ADDRESS|required|public|127.0.0.1
+SMTP_LISTEN_PORT|required|public|2525
+SMTP_MAX_MESSAGE_BYTES|required|public|26214400
+SMTP_MAX_SESSIONS_PER_IP|required|public|5
+SMTP_MESSAGES_PER_MINUTE|required|public|30
+SMTP_ALLOWED_SOURCE_CIDRS|required|public|127.0.0.1/32
+SMTP_ALLOWED_SENDER_ADDRESSES|required|public|noreply@example.invalid
+GRAPH_SENDER_MAILBOX|required|public|noreply@example.invalid
+NONPRODUCTION_RECIPIENT_ALLOWLIST|required|public|recipient@example.invalid
+QUEUE_MAX_BYTES|required|public|1073741824
+QUEUE_REJECT_THRESHOLD_PERCENT|required|public|80
+FAILED_PAYLOAD_RETENTION_DAYS|required|public|7
+LOG_RETENTION_DAYS|required|public|30
+SWARM_STACK_NAME|required|public|smtp2graph
+SWARM_OVERLAY_NETWORK|required|public|smtp2graph_internal
+GRAPH_TENANT_ID_SECRET_NAME|required|secret-reference|REPLACE_WITH_VERSIONED_SECRET_NAME
+GRAPH_CLIENT_ID_SECRET_NAME|required|secret-reference|REPLACE_WITH_VERSIONED_SECRET_NAME
+GRAPH_CREDENTIAL_SECRET_NAME|required|secret-reference|REPLACE_WITH_VERSIONED_SECRET_NAME
+SMTP_CREDENTIALS_SECRET_NAME|required|secret-reference|REPLACE_WITH_VERSIONED_SECRET_NAME
+TLS_CERTIFICATE_SECRET_NAME|required|secret-reference|REPLACE_WITH_VERSIONED_SECRET_NAME
+TLS_PRIVATE_KEY_SECRET_NAME|required|secret-reference|REPLACE_WITH_VERSIONED_SECRET_NAME

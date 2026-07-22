@@ -4,7 +4,7 @@ PRE_COMMIT ?= $(VENV_DIR)/bin/pre-commit
 
 export PRE_COMMIT_HOME := $(CURDIR)/.cache/pre-commit
 
-.PHONY: bootstrap validate
+.PHONY: bootstrap validate verify-env
 
 bootstrap:
 	$(PYTHON) -m venv "$(VENV_DIR)"
@@ -12,4 +12,8 @@ bootstrap:
 	"$(PRE_COMMIT)" install-hooks
 
 validate:
+	$(MAKE) verify-env
 	PRE_COMMIT_BIN="$(CURDIR)/$(PRE_COMMIT)" ./scripts/validate.sh
+
+verify-env:
+	./scripts/verify-env.sh --example-only

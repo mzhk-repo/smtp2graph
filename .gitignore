@@ -1,3 +1,6 @@
 docs/hello-world.md
 .cache/
 .venv/
+.env
+.env.*
+!.env.example

@@ -14,6 +14,7 @@ The planned initial gateway candidate is SMTP2Graph. This is not yet an accepted
 - `docs/AI_CONTEXT.md` is the compact entry point for future agents.
 - Task 1.1 inventory is complete. The Koha-derived GitHub workflow and deployment script are quarantined outside their executable paths and are not SMTP2Graph-ready. They may be replaced or selectively adapted only through a reviewed roadmap task.
 - Task 1.2 local quality baseline is complete. `make validate` runs pinned Markdown, YAML, and shell-format checks plus `git diff --check`; Gitleaks and ShellCheck remain CI-owned checks.
+- Task 1.3 experimental configuration contract is complete. `.env.example` contains safe development values and versioned-secret-name placeholders only; `verify-env.sh --example-only` validates the allowlisted keys without sourcing an environment file.
 
 ## Key Decisions
 
@@ -51,6 +52,7 @@ The target queue is durable but bounded to 1 GiB. At 80% utilization, new SMTP s
 - Identity and mail delivery: Microsoft Entra ID, Microsoft Graph, Exchange Online RBAC for Applications.
 - Configuration/deployment: reviewed declarative Swarm manifests and idempotent shell scripts.
 - Local quality: GNU Make, project-local pre-commit 4.6.0, and hooks frozen to immutable commits.
+- Configuration contract: experimental until Gate B; non-secret settings and secret references are separated in `deploy/config/env-contract.keys`.
 - CI/CD: protected branches and protected production environment; exact provider workflow must be rebuilt from the current template.
 - Observability: VictoriaMetrics and Grafana, plus an independent notification channel.
 
@@ -77,10 +79,15 @@ docs/
   adr/             # ADR policy; records are added with accepted decisions
 deploy/
   README.md        # deployment boundary; no runtime manifests yet
+  config/
+    env-contract.keys  # machine-checkable experimental configuration contract
 tests/
   README.md        # test policy; suites are added with implementation tasks
+  shell/
+    test-verify-env.sh # negative tests for the example-only contract validator
 scripts/
   validate.sh      # non-mutating local quality entry point
+  verify-env.sh    # validates .env.example without sourcing it
   lib/             # shared script contract; no runtime helpers yet
   quarantine/
     deploy-orchestrator-swarm.koha.sh.disabled  # non-executable, fail-closed legacy template
@@ -147,4 +154,4 @@ If this file conflicts with `docs/SPEC.md`, `docs/ROADMAP.md`, or an applicable 
 
 ## Last Updated
 
-2026-07-21 — Updated after Task 1.2 established the repository structure and pinned local quality baseline.
+2026-07-22 — Updated after Task 1.3 established the experimental configuration contract and safe example validator.

@@ -32,6 +32,18 @@ make validate
 
 `make validate` не читає `.env` файли, не отримує secrets і не звертається до Docker або production. `gitleaks` і `ShellCheck` виконуються на CI-рівні з конфігураціями `.gitleaks.toml` та `.shellcheckrc`.
 
+## Configuration contract
+
+[`.env.example`](.env.example) містить лише safe development values та імена майбутніх Docker Secrets. Він не є production env-файлом і не повинен копіюватися в `.env`.
+
+Machine-checkable ключі визначені у [`deploy/config/env-contract.keys`](deploy/config/env-contract.keys). Перевірка не використовує `source`, не друкує values і доступна окремо:
+
+```bash
+make verify-env
+```
+
+Contract є experimental до Gate B. Image digest, SMTP2Graph upstream keys, runtime render paths і production recipient policy буде визначено тільки після кваліфікації кандидата.
+
 ## Deployment safety
 
 Активного deployment workflow або SMTP2Graph orchestrator у repository ще немає. Koha-derived assets ізольовані в quarantine й не повинні виконуватися. Production deployment дозволений лише після відповідних roadmap gates і reviewed IaC.
