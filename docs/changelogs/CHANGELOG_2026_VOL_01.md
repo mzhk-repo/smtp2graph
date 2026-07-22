@@ -57,3 +57,10 @@ Rollback:
     Verification: Registry manifest inspection, digest-pinned pull, image metadata review, upstream release/Dockerfile review і repository validation виконані; Trivy/Syft/Cosign evidence ще не отримано.
     Risks: Відсутність vulnerability scan, SBOM/signature verification і non-root evidence блокує Gate B та production use.
     Rollback: Видалити candidate artifact і повернути ADR-0002 до стану без pinned candidate; production runtime не змінювався.
+
+2026-07-22 — Roadmap: Syft SBOM перед production
+    Context: Фінальний release pipeline потребує відтворюваного software inventory перед Production Deployment Gate.
+    Change: У Task 6.3, Release Candidate Gate і Production Deployment Gate додано обов’язкову генерацію CycloneDX SBOM через Syft з exact image digest, hash/immutable artifact retention та pre-deploy verification.
+    Verification: Перевірено структуру roadmap і Markdown validation; runtime pipeline не змінювався.
+    Risks: Release блокується, якщо Syft artifact відсутній, не відповідає digest або не має immutable retention.
+    Rollback: Вилучення candidate/release artifact не повинно обходити SBOM gate; pipeline changes відкочуються окремим reviewed commit.

@@ -760,15 +760,16 @@ Implementation task готова до виконання, лише якщо:
 - **Goal:** сформувати reviewed immutable RC.
 - **Depends on:** Tasks 6.1–6.2.
 - **Definition of Ready:** усі suites й scan thresholds визначені.
-- **Implementation Steps:** negative auth/network/sender tests; secret surfaces/history; SAST/dependency/image/IaC scans; SBOM; evidence hashes; release checklist.
+- **Implementation Steps:** negative auth/network/sender tests; secret surfaces/history; SAST/dependency/image/IaC scans; generate a CycloneDX SBOM with Syft from the exact pinned image digest; hash and attach the SBOM as an immutable CI artifact; complete the release checklist.
 - **Files / Directories:** `tests/security/`, `.github/workflows/`, `docs/RELEASE_CHECKLIST.md` або секція RUNBOOK.
 - **Artifacts:** signed/tagged RC metadata і scan evidence.
-- **Acceptance Criteria:** усі Must checks green; digest immutable; no unresolved Critical/High; exception має owner/expiry/approval.
+- **Acceptance Criteria:** усі Must checks green; digest immutable; Syft SBOM успішно згенерований саме для release digest, його hash і artifact retention перевірені; no unresolved Critical/High; exception має owner/expiry/approval.
 - **Validation Commands:**
   ```bash
   make validate
   make test-integration
   make security-scan
+  syft "${GATEWAY_IMAGE_DIGEST}" -o cyclonedx-json="artifacts/sbom-${RELEASE_ID}.cdx.json"
   ```
 - **Risks:** waiver нормалізує реальну вразливість.
 - **Rollback Notes:** failed RC анулюється; той самий tag не перевикористовується.
@@ -988,7 +989,7 @@ Implementation task готова до виконання, лише якщо:
 - [ ] Full lint/type/schema/unit/integration/security suites зелені.
 - [ ] Five-client compatibility matrix завершена.
 - [ ] Failure injection, burst, restart, retention і disk guard tests зелені.
-- [ ] Image digest pinned; SBOM і vulnerability evidence immutable.
+- [ ] Image digest pinned; Syft-generated CycloneDX SBOM і vulnerability evidence immutable, hashed та пов’язані з цим digest.
 - [ ] Немає unresolved Critical/High findings.
 - [ ] Release checklist і rollback artifact reviewed.
 
@@ -997,6 +998,7 @@ Implementation task готова до виконання, лише якщо:
 - [ ] Gate B, C, D passed.
 - [ ] Protected environment manual approval.
 - [ ] Target environment, digest, config і versioned secrets явно перевірені.
+- [ ] CycloneDX SBOM, згенерований Syft для exact digest, доступний у immutable release artifacts і пройшов pre-deploy verification.
 - [ ] Current health і recovery artifact verified перед deploy.
 - [ ] Post-deploy SMTP policy smoke та independent synthetic delivery успішні.
 - [ ] Rollback trigger, queue assessment і owner on-call визначені.
