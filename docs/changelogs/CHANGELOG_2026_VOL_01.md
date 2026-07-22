@@ -36,3 +36,17 @@ Rollback:
     Verification: Перевірено внутрішні phase links, наявність README/AI_CONTEXT/changelog/documentation map і `git diff --check`.
     Risks: Phase map є навігаційним summary; детальні acceptance criteria залишаються у відповідних phase/task sections.
     Rollback: Видалити додану Phase Map section і Task 1.4 changelog entry окремою reviewed зміною; source requirements не змінювалися.
+
+2026-07-22 — Task 2.1: ADR baseline та component decision
+    Context: Архітектурні та security-рішення були погоджені в SPEC, але ще не мали окремих довготривалих decision records.
+    Change: Створено ADR-0001…ADR-0007 та індекс ADR. Зафіксовано SMTP-to-Graph boundary, single-node Swarm, sender mailbox, mailbox-scoped Graph authorization, runtime secrets, single-instance topology і cold recovery; ADR-0002 залишено Proposed до Gate B.
+    Verification: Перевірено обов’язкові ADR sections, статуси, roadmap/SPEC links, Markdown lint, `git diff --check` і secret scan.
+    Risks: ADR-0002 не є підтвердженням upstream component readiness; production implementation залишається заблокованою до Gate B.
+    Rollback: Proposed ADR можна уточнити за результатами qualification; Accepted decisions змінюються лише новим superseding ADR.
+
+2026-07-22 — Уточнення ADR-0004: sender mailbox policy
+    Context: Початковий MVP використовує одного відправника, але production-вимога потребує ізоляції поштових ідентичностей між сервісами.
+    Change: ADR-0004 уточнено: `noreply@ldubgd.edu.ua` використовується лише для MVP, а перед production кожен сервіс отримує окрему dedicated mailbox і sender allowlist.
+    Verification: Перевірено ADR sections, синхронізацію з AI_CONTEXT, Markdown lint і `git diff --check`.
+    Risks: Production onboarding потребуватиме створення та окремого lifecycle для кількох mailbox identities.
+    Rollback: MVP policy залишається доступною як тимчасовий режим; production mailbox model змінюється лише окремим superseding ADR.

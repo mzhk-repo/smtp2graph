@@ -7,6 +7,7 @@
 - [`docs/SPEC.md`](docs/SPEC.md) — погоджені вимоги та security baseline.
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — порядок реалізації та quality gates.
 - [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md) — компактний актуальний контекст.
+- [`docs/adr/README.md`](docs/adr/README.md) — індекс базових architecture/security decisions.
 - [`CHANGELOG.md`](CHANGELOG.md) — індекс томів changelog.
 
 ## Локальні prerequisites

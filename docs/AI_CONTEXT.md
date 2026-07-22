@@ -16,12 +16,13 @@ The planned initial gateway candidate is SMTP2Graph. This is not yet an accepted
 - Task 1.2 local quality baseline is complete. `make validate` runs pinned Markdown, YAML, and shell-format checks plus `git diff --check`; Gitleaks and ShellCheck remain CI-owned checks.
 - Task 1.3 experimental configuration contract is complete. `.env.example` contains safe development values and versioned-secret-name placeholders only; `verify-env.sh --example-only` validates the allowlisted keys without sourcing an environment file.
 - Task 1.4 documentation baseline is complete. `README.md`, `AI_CONTEXT.md`, the changelog index/active volume, roadmap documentation map, and the roadmap phase transition map are present and linked.
+- Task 2.1 ADR baseline is complete. `docs/adr/ADR-0001` through `ADR-0007` record the SMTP-to-Graph boundary, initial gateway candidate, Swarm topology, sender mailbox, Graph mailbox scope, secret boundary, and cold-recovery model. `ADR-0002` remains Proposed pending Gate B.
 
 ## Key Decisions
 
 - Use Microsoft Graph application-only authentication; do not enable Exchange Online SMTP AUTH, app passwords, mailbox passwords, or Security Defaults exceptions.
 - Production minimum is one SMTP gateway instance on a single-node Docker Swarm host.
-- Use one dedicated sender mailbox initially: `noreply@ldubgd.edu.ua`.
+- Use one dedicated sender mailbox for the MVP: `noreply@ldubgd.edu.ua`; production uses one dedicated mailbox per service with service-specific sender allowlists.
 - Restrict application `Mail.Send` to the approved mailbox through Exchange Online RBAC for Applications.
 - Prefer certificate-based Graph credentials if the pinned gateway supports safe file-based use; a runtime client secret is an explicitly documented fallback.
 - Use Docker Secrets mounted at `/run/secrets/`. Encrypted static environment material uses SOPS + age; plaintext production secrets must not persist in Git, images, `.env` files, CI artifacts, logs, or container environment.
@@ -145,7 +146,7 @@ If this file conflicts with `docs/SPEC.md`, `docs/ROADMAP.md`, or an applicable 
 
 ## Open Questions
 
-- Which exact SMTP2Graph release and immutable digest pass Gate B?
+- Which exact SMTP2Graph release and immutable digest pass Gate B? See [ADR-0002](adr/ADR-0002-select-smtp2graph-as-initial-gateway.md).
 - Does that release safely support certificate-file authentication and a tmpfs-rendered runtime configuration?
 - What are its exact SMTP acknowledgement, durable queue, `Retry-After`, dead-letter, and downgrade compatibility semantics?
 - What TLS certificate source and trust model will clients use?
@@ -156,4 +157,4 @@ If this file conflicts with `docs/SPEC.md`, `docs/ROADMAP.md`, or an applicable 
 
 ## Last Updated
 
-2026-07-22 — Updated after Task 1.4 completed the documentation baseline and roadmap phase transition map.
+2026-07-22 — Updated after Task 2.1 created the ADR baseline; ADR-0002 remains Proposed pending Gate B qualification.
