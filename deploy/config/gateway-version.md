@@ -40,7 +40,8 @@ The digest was resolved from the Docker Registry manifest and then pulled by dig
 | Certificate file path | Preliminary pass | Task 2.3 renders `privateKeyPath` from a Docker Secret mount and starts the candidate with a synthetic certificate |
 | Client-secret fallback | Preliminary pass | Task 2.3 renders a secret-file value only into tmpfs; synthetic value is absent from inspect and logs |
 | Non-root/read-only compatibility | Preliminary pass | Task 2.3 passed as UID/GID `65532:65532` with `/runtime` and `/tmp` tmpfs; the upstream image itself still has no configured `USER` |
-| Gate B | Not passed | Tasks 2.4–2.5, scan/SBOM/signature evidence and production secret review remain outstanding |
+| Protocol/MIME/queue | Partial; blockers found | See `docs/TEST_PLAN.md`: MIME and restart pass locally, but `Retry-After`, dead-letter and acknowledgement durability are unacceptable or incomplete |
+| Gate B | Not passed | Task 2.4 found protocol blockers; Task 2.5 must reject the candidate or document an approved mitigation, alongside scan/SBOM/signature and production secret review |
 
 ## Safe reproduction commands
 

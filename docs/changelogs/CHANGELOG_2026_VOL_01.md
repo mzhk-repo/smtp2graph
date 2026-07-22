@@ -71,3 +71,10 @@ Rollback:
     Verification: `./tests/acceptance/runtime/run.sh`, shell syntax checks, `make validate`, `git diff --check` і Gitleaks виконано успішно.
     Risks: Probe працює з `network=none` і synthetic inputs; він не доводить Graph token acquisition, actual delivery, Swarm Secret ownership або queue semantics.
     Rollback: Видалити prototype wrapper і acceptance probe окремою reviewed зміною; production runtime та production secrets не створювалися.
+
+2026-07-22 — Task 2.4: protocol, MIME, queue та acknowledgement qualification
+    Context: Gate B потребував фактичних evidence для MIME preservation, SMTP acknowledgement, queue restart і Graph failure behavior без production tenant.
+    Change: Додано isolated TLS token/Graph mock, synthetic MIME fixture та protocol/failure-injection harness. Створено `docs/TEST_PLAN.md` із behavior matrix і Gate B gaps.
+    Verification: MIME, BCC injection, UTF-8, attachment, SMTP acknowledgement ordering і queue restart пройшли; failure injection підтвердив bounded HTTP 500 retry та виявив два blocker-и.
+    Risks: SMTP2Graph v1.1.5 ігнорує Graph `Retry-After` та залишає `ErrorAccessDenied` payload у queue, а не у failed state; actual Microsoft 365 evidence ще відсутній.
+    Rollback: Видалити synthetic harness/fixtures окремою reviewed зміною; ADR-0002 не переводити в Accepted і production runtime не створювати.

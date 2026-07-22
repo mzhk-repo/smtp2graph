@@ -26,5 +26,6 @@ Production implementation must not depend on SMTP2Graph until Gate B is `pass` o
 - Qualification work is explicit and evidence-driven rather than an implicit component approval.
 - The candidate image reference is immutable, but it is not yet an approved production artifact; mutable tags remain prohibited for deployment.
 - The qualification wrapper writes only to container tmpfs and keeps Docker Secret files outside container environment variables; it remains a prototype until the production secret lifecycle is reviewed.
+- Task 2.4 found that the candidate ignores Graph `Retry-After` and leaves `ErrorAccessDenied` payloads in queue rather than failed state. These are Gate B blockers unless a reviewed mitigation changes the production design.
 - Gate B may reject or conditionally accept the candidate, requiring the ADR status and AI context to be updated with evidence.
 - Synthetic fixtures and isolated tenant resources are required for protocol and runtime tests.

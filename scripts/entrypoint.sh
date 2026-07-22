@@ -7,6 +7,9 @@ runtime_dir="${RUNTIME_CONFIG_DIR:-/runtime}"
 secrets_dir="${DOCKER_SECRETS_DIR:-/run/secrets}"
 auth_mode="${GRAPH_AUTH_MODE:-certificate}"
 render_mode="${RUNTIME_ENTRYPOINT_MODE:-run}"
+gateway_mode="${SMTP2GRAPH_MODE:-full}"
+retry_limit="${SEND_RETRY_LIMIT:-1}"
+retry_interval="${SEND_RETRY_INTERVAL_MINUTES:-1}"
 
 require_file() {
   if [ ! -r "$1" ]; then
@@ -35,6 +38,17 @@ required_value() {
   yaml_quote "$value"
 }
 
+required_integer() {
+  value="$1"
+  case "$value" in
+    '' | *[!0-9]*)
+      printf 'ERROR: required integer runtime value is invalid.\n' >&2
+      exit 64
+      ;;
+  esac
+  printf '%s' "$value"
+}
+
 mkdir -p "$runtime_dir"
 chmod 700 "$runtime_dir"
 umask 077
@@ -48,7 +62,7 @@ require_file "$smtp_tls_cert_path"
 
 config_file="$runtime_dir/config.yml"
 {
-  printf '%s\n' 'mode: full'
+  printf 'mode: %s\n' "$(required_value "$gateway_mode")"
   printf '%s\n' 'send:'
   printf '%s\n' '  appReg:'
   printf '    tenant: %s\n' "$(required_value "$tenant_id")"
@@ -73,8 +87,8 @@ config_file="$runtime_dir/config.yml"
       ;;
   esac
 
-  printf '%s\n' '  retryLimit: 1'
-  printf '%s\n' '  retryInterval: 1'
+  printf '  retryLimit: %s\n' "$(required_integer "$retry_limit")"
+  printf '  retryInterval: %s\n' "$(required_integer "$retry_interval")"
   printf '%s\n' 'receive:'
   printf '%s\n' '  port: 587'
   printf '  listenAddress: %s\n' "$(required_value "${SMTP_LISTEN_ADDRESS:-127.0.0.1}")"

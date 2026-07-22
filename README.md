@@ -55,6 +55,17 @@ Task 2.3 має відтворюваний synthetic compatibility probe:
 
 Він потребує доступного Docker daemon, створює лише тимчасові containers і synthetic certificate/secret files, використовує `network=none` та очищує ресурси після завершення. Це не є production deployment або доказом Graph delivery.
 
+## Protocol qualification
+
+Synthetic MIME, queue-restart та Graph failure-injection evidence описані в [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md). Локальні commands не звертаються до Microsoft 365:
+
+```bash
+./tests/acceptance/protocol/run.sh
+./tests/acceptance/protocol/failure-injection.sh
+```
+
+Другий command зараз завершується non-zero навмисно: він фіксує підтверджені Gate B blocker-и SMTP2Graph v1.1.5.
+
 ## Deployment safety
 
 Активного deployment workflow або SMTP2Graph orchestrator у repository ще немає. Koha-derived assets ізольовані в quarantine й не повинні виконуватися. Production deployment дозволений лише після відповідних roadmap gates і reviewed IaC.

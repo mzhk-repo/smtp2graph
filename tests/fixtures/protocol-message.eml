@@ -1,0 +1,20 @@
+From: "SMTP2Graph QA" <sender@example.invalid>
+To: primary@example.invalid
+Cc: copy@example.invalid
+Reply-To: replies@example.invalid
+Subject: UTF-8 тест — SMTP2Graph
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="smtp2graph-boundary"
+
+--smtp2graph-boundary
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+
+<html><body><p>Тестове HTML-повідомлення.</p></body></html>
+--smtp2graph-boundary
+Content-Type: text/plain; name="fixture.txt"
+Content-Disposition: attachment; filename="fixture.txt"
+Content-Transfer-Encoding: base64
+
+U1lOVEhFVElDX0FUVEFDSE1FTlQ=
+--smtp2graph-boundary--
