@@ -13,6 +13,7 @@ The planned initial gateway candidate is SMTP2Graph. This is not yet an accepted
 - `docs/ROADMAP.md` defines the implementation sequence, quality gates, and acceptance work.
 - `docs/AI_CONTEXT.md` is the compact entry point for future agents.
 - Task 1.1 inventory is complete. The Koha-derived GitHub workflow and deployment script are quarantined outside their executable paths and are not SMTP2Graph-ready. They may be replaced or selectively adapted only through a reviewed roadmap task.
+- Task 1.2 local quality baseline is complete. `make validate` runs pinned Markdown, YAML, and shell-format checks plus `git diff --check`; Gitleaks and ShellCheck remain CI-owned checks.
 
 ## Key Decisions
 
@@ -49,6 +50,7 @@ The target queue is durable but bounded to 1 GiB. At 80% utilization, new SMTP s
 - Secrets: Docker Secrets, SOPS + age.
 - Identity and mail delivery: Microsoft Entra ID, Microsoft Graph, Exchange Online RBAC for Applications.
 - Configuration/deployment: reviewed declarative Swarm manifests and idempotent shell scripts.
+- Local quality: GNU Make, project-local pre-commit 4.6.0, and hooks frozen to immutable commits.
 - CI/CD: protected branches and protected production environment; exact provider workflow must be rebuilt from the current template.
 - Observability: VictoriaMetrics and Grafana, plus an independent notification channel.
 
@@ -66,18 +68,27 @@ The target queue is durable but bounded to 1 GiB. At 80% utilization, new SMTP s
 ## Repository Structure
 
 ```text
+README.md
+Makefile
 docs/
   SPEC.md          # requirements and source of truth
   ROADMAP.md       # implementation plan and gates
   AI_CONTEXT.md    # this compact context
+  adr/             # ADR policy; records are added with accepted decisions
+deploy/
+  README.md        # deployment boundary; no runtime manifests yet
+tests/
+  README.md        # test policy; suites are added with implementation tasks
 scripts/
+  validate.sh      # non-mutating local quality entry point
+  lib/             # shared script contract; no runtime helpers yet
   quarantine/
     deploy-orchestrator-swarm.koha.sh.disabled  # non-executable, fail-closed legacy template
 .github/quarantine/
   main.koha.yml.disabled  # outside the GitHub Actions workflow discovery path
 ```
 
-Expected future paths are defined in the roadmap: `deploy/swarm/`, `deploy/config/`, `deploy/monitoring/`, `tests/`, `docs/adr/`, `docs/RUNBOOK.md`, `docs/TEST_PLAN.md`, and `docs/scripts_runbook.md`.
+Expected future paths are defined in the roadmap: `deploy/swarm/`, `deploy/config/`, `deploy/monitoring/`, test suites, `docs/RUNBOOK.md`, `docs/TEST_PLAN.md`, and `docs/scripts_runbook.md`.
 
 ## Initial Template Inventory
 
@@ -136,4 +147,4 @@ If this file conflicts with `docs/SPEC.md`, `docs/ROADMAP.md`, or an applicable 
 
 ## Last Updated
 
-2026-07-21 — Updated after Task 1.1 inventory and fail-closed quarantine of the Koha-derived deployment assets.
+2026-07-21 — Updated after Task 1.2 established the repository structure and pinned local quality baseline.

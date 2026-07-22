@@ -1,0 +1,4 @@
+title = "smtp2graph secret scanning policy"
+
+[extend]
+useDefault = true
