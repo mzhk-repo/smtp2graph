@@ -78,3 +78,10 @@ Rollback:
     Verification: MIME, BCC injection, UTF-8, attachment, SMTP acknowledgement ordering і queue restart пройшли; failure injection підтвердив bounded HTTP 500 retry та виявив два blocker-и.
     Risks: SMTP2Graph v1.1.5 ігнорує Graph `Retry-After` та залишає `ErrorAccessDenied` payload у queue, а не у failed state; actual Microsoft 365 evidence ще відсутній.
     Rollback: Видалити synthetic harness/fixtures окремою reviewed зміною; ADR-0002 не переводити в Accepted і production runtime не створювати.
+
+2026-07-22 — Task 2.5 roadmap: Gate B reject і fork remediation decision
+    Context: Protocol qualification виявила три Critical gaps upstream SMTP2Graph v1.1.5, тому Phase 3 не може покладатися на поточний candidate.
+    Change: Roadmap фіксує Gate B reject для upstream v1.1.5, порівнює мінімальний fork, інший upstream gateway і власний Production Minimum та обирає fork із малим patch-set. Додано remediation steps, повторну digest-scoped кваліфікацію і Python fallback.
+    Verification: `make validate` і `git diff --check` виконано успішно; ADR-0002 та AI_CONTEXT не змінювалися до фактичного повторного Gate B.
+    Risks: Fork створює patch maintenance і license obligations; Phase 3 залишається заблокованою до повторного Gate B без Critical gaps.
+    Rollback: Відкотити roadmap decision окремою reviewed зміною; вибір іншого component потребує ADR і повного Gate B для його exact digest.

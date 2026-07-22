@@ -433,21 +433,50 @@ Implementation task готова до виконання, лише якщо:
 ### Task 2.5 — Gate B review
 
 - **Priority:** Must
-- **Goal:** прийняти evidence-based рішення щодо SMTP2Graph.
+- **Goal:** відхилити неприйнятний upstream candidate, обрати remediation path і повторити Gate B для нового exact digest.
 - **Depends on:** Tasks 2.1–2.4.
-- **Definition of Ready:** усі Gate B checks мають результат і owner.
-- **Implementation Steps:** провести architecture/security/operations review; закрити ADR-0002; зафіксувати gaps та expiry exceptions.
-- **Files / Directories:** `docs/adr/ADR-0002-*`, `docs/AI_CONTEXT.md`, Gate evidence location.
-- **Artifacts:** Gate B decision record.
-- **Acceptance Criteria:** `pass/conditional pass/reject` однозначний; reject блокує Phase 3; conditional pass не переносить Critical gap у production.
-- **Validation Commands:** manual evidence review; перевірка links і hashes artifacts.
-- **Risks:** schedule pressure знижує gate.
-- **Rollback Notes:** gate можна повторити для нового digest; старий evidence не переноситься автоматично.
+- **Definition of Ready:** Tasks 2.2–2.4 мають відтворюваний evidence; Critical gaps класифіковані; remediation owner і review roles визначені.
+- **Gate B Decision:** upstream SMTP2Graph `v1.1.5` має статус `reject` і не є production component. Підтверджені Critical blocker-и:
+  1. Graph `Retry-After` ігнорується, тому retry відбувається раніше за дозволений server-side interval.
+  2. Permanent Graph error залишається у live queue замість атомарного переходу до `failed`.
+  3. SMTP `250` повертається після закриття temporary EML, але до підтвердженого durable enqueue через rename та `fsync` файла і queue-каталогу.
+- **Alternatives Review:** оцінки є planning ranges для аналізу, реалізації, тестів, review і документації, а не гарантованими лімітами.
+
+  | Варіант | Орієнтовна робота | Орієнтовні AI-токени | Складність | Ризик повторної кваліфікації | Рішення |
+  |---|---:|---:|---|---|---|
+  | Мінімальний fork від exact `v1.1.5` | 8–15 engineer-days | 120–250 тис. | Середня; три локалізовані зміни та регресійні тести | Середній; повторюються змінені та Critical сценарії, supply-chain evidence формується для нового digest | **Selected** |
+  | Інший upstream gateway | 15–30 engineer-days | 200–450 тис. | Середня/висока; нові runtime та configuration contracts | Високий; Gate B фактично повторюється повністю, а durable queue може бути відсутня | Не обрано |
+  | Власний Go/Rust/Python Production Minimum | 30–90 engineer-days | 500 тис.–1,6 млн | Висока; власні SMTP, durability, retry, recovery та observability | Високий; новий компонент проходить повний Gate B | Fallback: Python |
+
+  Для власного компонента Python обрано як fallback відповідно до наявної компетенції команди; Go має кращий deployment/runtime profile, а Rust — сильні compile-time гарантії, але обидва варіанти не вкладаються у погоджений горизонт 2–4 тижні без додаткового ownership і toolchain investment.
+- **Component Decision:** створити мінімальний fork від exact upstream `v1.1.5`, зберігати малий reviewable patch-set, випускати immutable image digest і запропонувати зміни upstream окремими PR. Fork стає новим qualification candidate, але не production component до повторного Gate B. Якщо patch-set неможливо безпечно підтримувати або upstream diverges настільки, що мінімальний rebase втрачається, створити окремий ADR для власного Python Production Minimum і повторити повний Gate B.
+- **Implementation Steps:**
+  1. Створити fork від exact upstream tag `v1.1.5`; задокументувати upstream commit, license obligations і patch ownership.
+  2. Реалізувати bounded exponential backoff із jitter та підтримкою Graph `Retry-After` у форматах delta-seconds і HTTP-date; валідний bounded `Retry-After` має пріоритет над локальною затримкою.
+  3. Класифікувати permanent Graph errors і атомарно переміщувати відповідні payloads із live queue до `failed` без нескінченного retry.
+  4. Перенести SMTP success boundary після durable enqueue: atomic rename, `fsync` queue-файла та queue-каталогу; при помилці durability повертати temporary SMTP failure, а не `250`.
+  5. Повторити protocol, MIME, BCC, UTF-8, attachment, restart, durability та failure-injection tests; окремо перевірити crash одразу після SMTP `250` і відсутність duplicate enqueue.
+  6. Виконати non-production Microsoft 365 checks, vulnerability scan, Syft SBOM і provenance review; сформувати та зафіксувати exact fork image digest.
+  7. Провести повторний architecture/security/operations review; лише після нового Gate B decision оновити ADR-0002 та `docs/AI_CONTEXT.md`.
+- **Files / Directories:** fork source repository; `docs/TEST_PLAN.md`; `deploy/config/gateway-version.md`; `docs/adr/ADR-0002-*`; `docs/AI_CONTEXT.md`; immutable Gate B evidence location.
+- **Artifacts:** upstream rejection record; fork patch inventory; test evidence; scan/SBOM artifacts; exact fork digest; повторний Gate B decision record.
+- **Acceptance Criteria:**
+  - Upstream `v1.1.5` однозначно позначений rejected candidate і не використовується як production component.
+  - Fork проходить `Retry-After`, permanent-error-to-failed та durable-acknowledgement blocker scenarios.
+  - MIME, BCC, UTF-8, attachments і queue restart не мають регресій.
+  - Gate B decision посилається на exact fork digest і його immutable evidence.
+  - `conditional pass` заборонений, якщо будь-який із трьох Critical blocker-ів залишається відкритим.
+  - Evidence upstream digest не переноситься на fork автоматично; кожен reused artifact має applicability review.
+  - Phase 3 залишається заблокованою до `pass` або `conditional pass` нового candidate без Critical gaps.
+- **Validation Commands:** виконати task-specific test harnesses; `make validate`; `git diff --check`; вручну перевірити links, artifact hashes, digest applicability і approval record.
+- **Risks:** patch-set drift, GPL obligations, upstream security fixes, помилкова інтерпретація filesystem durability та schedule pressure можуть знизити якість gate.
+- **Rollback Notes:** fork candidate можна відхилити без production migration; повернення до іншого upstream або власного Python component потребує нового/оновленого ADR і повного Gate B для нового digest.
 
 **Phase 2 Quality Gate**
 
-- [ ] Gate B decision approved.
-- [ ] Version і digest pinned; SBOM/scan evidence збережені.
+- [ ] Upstream `v1.1.5` rejection і remediation decision approved.
+- [ ] Повторний Gate B для fork candidate approved без Critical gaps.
+- [ ] Fork version і digest pinned; SBOM/scan evidence збережені.
 - [ ] Secret, non-root/read-only, MIME, queue і acknowledgement behavior доведені.
 - [ ] ADR та AI_CONTEXT актуальні.
 
