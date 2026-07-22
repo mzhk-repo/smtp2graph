@@ -64,3 +64,10 @@ Rollback:
     Verification: Перевірено структуру roadmap і Markdown validation; runtime pipeline не змінювався.
     Risks: Release блокується, якщо Syft artifact відсутній, не відповідає digest або не має immutable retention.
     Rollback: Вилучення candidate/release artifact не повинно обходити SBOM gate; pipeline changes відкочуються окремим reviewed commit.
+
+2026-07-22 — Task 2.3: runtime, secrets і container compatibility spike
+    Context: SMTP2Graph v1.1.5 потребував evidence для secret-file rendering, non-root/read-only execution і lifecycle signals до protocol qualification.
+    Change: Додано tmpfs-only runtime wrapper і isolated Docker acceptance probe з synthetic certificate та client-secret fallback. Probe перевіряє UID/GID 65532, read-only rootfs, dropped capabilities, no-new-privileges, listener, graceful stop/restart і відсутність synthetic secret у inspect/logs.
+    Verification: `./tests/acceptance/runtime/run.sh`, shell syntax checks, `make validate`, `git diff --check` і Gitleaks виконано успішно.
+    Risks: Probe працює з `network=none` і synthetic inputs; він не доводить Graph token acquisition, actual delivery, Swarm Secret ownership або queue semantics.
+    Rollback: Видалити prototype wrapper і acceptance probe окремою reviewed зміною; production runtime та production secrets не створювалися.

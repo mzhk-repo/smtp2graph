@@ -6,7 +6,7 @@
 
 ## Context
 
-The project needs one maintainable SMTP-to-Graph component for the production minimum. SMTP2Graph is the initial candidate because its stated feature set includes SMTP server support, Graph relay, SMTP authentication, TLS, IP and sender allowlists, rate limiting, brute-force protection and a local queue. The v1.1.5 release and image digest are now recorded as a qualification candidate, but runtime and security evidence is incomplete.
+The project needs one maintainable SMTP-to-Graph component for the production minimum. SMTP2Graph is the initial candidate because its stated feature set includes SMTP server support, Graph relay, SMTP authentication, TLS, IP and sender allowlists, rate limiting, brute-force protection and a local queue. The v1.1.5 release and image digest are recorded as a qualification candidate. A synthetic runtime spike passed certificate-file and client-secret rendering plus non-root/read-only startup, but security and delivery evidence remains incomplete.
 
 ## Decision
 
@@ -25,5 +25,6 @@ Production implementation must not depend on SMTP2Graph until Gate B is `pass` o
 
 - Qualification work is explicit and evidence-driven rather than an implicit component approval.
 - The candidate image reference is immutable, but it is not yet an approved production artifact; mutable tags remain prohibited for deployment.
+- The qualification wrapper writes only to container tmpfs and keeps Docker Secret files outside container environment variables; it remains a prototype until the production secret lifecycle is reviewed.
 - Gate B may reject or conditionally accept the candidate, requiring the ADR status and AI context to be updated with evidence.
 - Synthetic fixtures and isolated tenant resources are required for protocol and runtime tests.

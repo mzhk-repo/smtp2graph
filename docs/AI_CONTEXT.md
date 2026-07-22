@@ -17,6 +17,7 @@ The planned initial gateway candidate is SMTP2Graph. This is not yet an accepted
 - Task 1.3 experimental configuration contract is complete. `.env.example` contains safe development values and versioned-secret-name placeholders only; `verify-env.sh --example-only` validates the allowlisted keys without sourcing an environment file.
 - Task 1.4 documentation baseline is complete. `README.md`, `AI_CONTEXT.md`, the changelog index/active volume, roadmap documentation map, and the roadmap phase transition map are present and linked.
 - Task 2.1 ADR baseline is complete. `docs/adr/ADR-0001` through `ADR-0007` record the SMTP-to-Graph boundary, initial gateway candidate, Swarm topology, sender mailbox, Graph mailbox scope, secret boundary, and cold-recovery model. `ADR-0002` remains Proposed pending Gate B.
+- Task 2.3 runtime compatibility spike is complete with synthetic inputs. The prototype renders configuration in tmpfs, supports certificate-file and client-secret fallback modes, and passes non-root/read-only startup, listener, stop/restart and secret-surface checks; Graph token and delivery behavior remain unqualified.
 
 ## Key Decisions
 
@@ -48,7 +49,7 @@ The target queue is durable but bounded to 1 GiB. At 80% utilization, new SMTP s
 
 ## Tech Stack
 
-- Gateway qualification candidate: SMTP2Graph v1.1.5, immutable digest recorded in `deploy/config/gateway-version.md`; Gate B remains open because scan, SBOM and runtime compatibility evidence is incomplete.
+- Gateway qualification candidate: SMTP2Graph v1.1.5, immutable digest recorded in `deploy/config/gateway-version.md`; runtime compatibility spike passed, but Gate B remains open because scan, SBOM, Graph token and protocol/queue evidence is incomplete.
 - Runtime/orchestration: Docker Swarm, single node, one service replica.
 - Secrets: Docker Secrets, SOPS + age.
 - Identity and mail delivery: Microsoft Entra ID, Microsoft Graph, Exchange Online RBAC for Applications.
@@ -157,4 +158,4 @@ If this file conflicts with `docs/SPEC.md`, `docs/ROADMAP.md`, or an applicable 
 
 ## Last Updated
 
-2026-07-22 — Updated after Task 2.2 recorded SMTP2Graph v1.1.5 as a pinned qualification candidate; ADR-0002 remains Proposed pending Gate B evidence.
+2026-07-22 — Updated after Task 2.3 passed the synthetic runtime compatibility spike; ADR-0002 remains Proposed pending Gate B evidence.

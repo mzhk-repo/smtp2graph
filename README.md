@@ -45,6 +45,16 @@ make verify-env
 
 Contract є experimental до Gate B. Qualification candidate version/digest зафіксовано в [`deploy/config/gateway-version.md`](deploy/config/gateway-version.md), але SMTP2Graph upstream keys, runtime render paths і production recipient policy буде визначено тільки після повної кваліфікації кандидата.
 
+## Isolated runtime qualification
+
+Task 2.3 має відтворюваний synthetic compatibility probe:
+
+```bash
+./tests/acceptance/runtime/run.sh
+```
+
+Він потребує доступного Docker daemon, створює лише тимчасові containers і synthetic certificate/secret files, використовує `network=none` та очищує ресурси після завершення. Це не є production deployment або доказом Graph delivery.
+
 ## Deployment safety
 
 Активного deployment workflow або SMTP2Graph orchestrator у repository ще немає. Koha-derived assets ізольовані в quarantine й не повинні виконуватися. Production deployment дозволений лише після відповідних roadmap gates і reviewed IaC.

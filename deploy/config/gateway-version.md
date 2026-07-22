@@ -24,6 +24,7 @@ The digest was resolved from the Docker Registry manifest and then pulled by dig
 - The registry exposes amd64 and arm64 manifests plus OCI attestation manifests for the two platform manifests.
 - The upstream Dockerfile uses `node:20-alpine`, exposes TCP/587, declares `/data` as a volume and starts `/bin/sh -c startup.sh`.
 - Local image metadata reports `Created=2026-05-03T11:20:50.91496843Z`, `Architecture=amd64`, and no configured non-root `User`.
+- Task 2.3 isolated runtime probe passed with certificate-file mode and client-secret fallback. It rendered `config.yml` only in a container tmpfs, started the candidate as UID/GID `65532:65532` with a read-only root filesystem, dropped capabilities and `no-new-privileges`, then verified listener readiness, graceful stop and clean restart.
 
 ## Qualification status
 
@@ -36,8 +37,10 @@ The digest was resolved from the Docker Registry manifest and then pulled by dig
 | Image signature verification | Pending | `cosign` is not installed; no signature verification result recorded |
 | Vulnerability scan | Pending | `trivy` is not installed; no severity result recorded |
 | SBOM | Pending | `syft` is not installed; no immutable SBOM artifact recorded |
-| Non-root compatibility | Blocked/pending Task 2.3 | Image metadata has no configured `USER`; runtime behavior is not qualified |
-| Gate B | Not passed | Tasks 2.3–2.5 and security review remain outstanding |
+| Certificate file path | Preliminary pass | Task 2.3 renders `privateKeyPath` from a Docker Secret mount and starts the candidate with a synthetic certificate |
+| Client-secret fallback | Preliminary pass | Task 2.3 renders a secret-file value only into tmpfs; synthetic value is absent from inspect and logs |
+| Non-root/read-only compatibility | Preliminary pass | Task 2.3 passed as UID/GID `65532:65532` with `/runtime` and `/tmp` tmpfs; the upstream image itself still has no configured `USER` |
+| Gate B | Not passed | Tasks 2.4–2.5, scan/SBOM/signature evidence and production secret review remain outstanding |
 
 ## Safe reproduction commands
 
@@ -49,4 +52,4 @@ trivy image --severity HIGH,CRITICAL --exit-code 1 docker.io/smtp2graph/smtp2gra
 syft docker.io/smtp2graph/smtp2graph@sha256:88ef2015f37ad460d7cc06fa80cf82a0318108ae696dac61a2896d5016d9545d -o cyclonedx-json
 ```
 
-The last three commands are intentionally not recorded as successful: the local environment lacks Trivy and Syft, and the inspect command must be run with access to the Docker daemon. The image reference in this file is a qualification candidate, not an approved production deployment reference.
+The last three commands are intentionally not recorded as successful: the local environment lacks Trivy and Syft, and the inspect command must be run with access to the Docker daemon. Runtime evidence is reproduced with `./tests/acceptance/runtime/run.sh`; it uses synthetic files and `network=none`, so it does not prove Graph token acquisition or delivery behavior. The image reference in this file is a qualification candidate, not an approved production deployment reference.
