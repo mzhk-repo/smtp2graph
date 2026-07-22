@@ -3,9 +3,36 @@
 **Статус:** план імплементації
 **Джерело вимог:** `docs/SPEC.md`
 **Стратегія:** MVP First → Production Minimum First
-**Останнє оновлення:** 2026-07-21
+**Останнє оновлення:** 2026-07-22
 
 > Цей документ призначений для поетапної AI-assisted implementation. Він не є підтвердженням того, що описані компоненти вже реалізовані або перевірені. Фактичний стан фіксується у `docs/AI_CONTEXT.md`, а результати рішень — в ADR.
+
+# 0. Phase Map and Transition Rules
+
+## Послідовність фаз
+
+| Фаза | Призначення | Очікуваний результат | Умова переходу |
+|---|---|---|---|
+| [Phase 1](#phase-1--repository-tooling-and-local-development-baseline) | Repository, tooling та local development baseline | `v0.1`: безпечна структура, контекст, contract і локальні checks | Phase 1 Quality Gate пройдений; configuration contract reviewed |
+| [Phase 2](#phase-2--core-architecture-and-gateway-qualification) | Core architecture та gateway qualification | `v0.2`: evidence bundle і рішення Gate B | Gate B `pass` або `conditional pass` без Critical blocker |
+| [Phase 3](#phase-3--core-functional-implementation) | Local functional MVP | `v0.3`: відтворюваний non-production SMTP-to-Graph skeleton | Phase 3 Quality Gate пройдений; локальні negative/restart тести зелені |
+| [Phase 4](#phase-4--authentication-authorization-and-security-baseline) | Authentication, authorization і security baseline | `v0.4`: Gate C evidence, TLS, secret boundary та hardening | Gate C пройдений на non-production evidence |
+| [Phase 5](#phase-5--deployment-and-gitsecops) | Deployment та GitSecOps | `v0.5`: staging deployment candidate з rollback | staging deploy, no-op redeploy і rollback rehearsal успішні |
+| [Phase 6](#phase-6--testing-stabilization-and-release-candidate) | Testing, stabilization та release candidate | `v0.6`: функціональне/security/failure/recovery evidence | усі Must-тести зелені; Critical/High findings закриті або formally excepted |
+| [Phase 7](#phase-7--observability-backup-restore-and-operations) | Observability, backup/restore та operations | `v0.7`: runbooks, game day і Gate D evidence | Gate D пройдений; cold recovery вкладається у RTO 60 хвилин |
+| [Phase 8](#phase-8--optional-post-production-hardening) | Optional post-production hardening | контрольовані покращення після `v1.0` | окремий business/security trigger і approved scope; фаза не є передумовою `v1.0` |
+
+## Переходи між фазами
+
+Основний послідовний шлях:
+
+`Gate A → Phase 1 → Phase 1 Quality Gate → Phase 2 → Gate B → Phase 3 → Phase 4 → Gate C → Phase 5 → Phase 6 → Phase 7 → Gate D → v1.0 → Phase 8 (optional)`
+
+- Невдалий Phase 1 Quality Gate повертає роботу в Phase 1; production implementation не починається.
+- Gate B `reject` повертає рішення до ADR/roadmap review і блокує Phase 3; `conditional pass` дозволяє Phase 3 лише без Critical gaps.
+- Невдалий Gate C повертає роботу до Phase 4 security boundary; Phase 5 production-capable deployment не дозволяється.
+- Невдалий Gate D повертає роботу до Phase 7 operations/recovery; `v1.0` не оголошується.
+- Phase 8 запускається лише після `v1.0` за окремим approved trigger і не змінює попередні acceptance gates.
 
 ---
 

@@ -15,6 +15,7 @@ The planned initial gateway candidate is SMTP2Graph. This is not yet an accepted
 - Task 1.1 inventory is complete. The Koha-derived GitHub workflow and deployment script are quarantined outside their executable paths and are not SMTP2Graph-ready. They may be replaced or selectively adapted only through a reviewed roadmap task.
 - Task 1.2 local quality baseline is complete. `make validate` runs pinned Markdown, YAML, and shell-format checks plus `git diff --check`; Gitleaks and ShellCheck remain CI-owned checks.
 - Task 1.3 experimental configuration contract is complete. `.env.example` contains safe development values and versioned-secret-name placeholders only; `verify-env.sh --example-only` validates the allowlisted keys without sourcing an environment file.
+- Task 1.4 documentation baseline is complete. `README.md`, `AI_CONTEXT.md`, the changelog index/active volume, roadmap documentation map, and the roadmap phase transition map are present and linked.
 
 ## Key Decisions
 
@@ -117,6 +118,7 @@ The runtime-mounted `.agents/` and `.codex/` directories are empty environment a
 | `docs/adr/ADR-*.md` | Accepted long-lived architectural decisions, once created | High for covered decisions |
 | `docs/RUNBOOK.md` | Operating, deploy, recovery, and incident procedures, once created | Operational source of truth |
 | `docs/TEST_PLAN.md` | Detailed test cases and evidence, once created | Test source of truth |
+| `CHANGELOG.md` and `docs/changelogs/` | Append-only change index and active volume | Significant user/operator-visible changes |
 
 If this file conflicts with `docs/SPEC.md`, `docs/ROADMAP.md`, or an applicable ADR, the source document takes precedence. Resolve ambiguity by updating the source document first, then this file when the change affects compact agent context.
 
@@ -154,4 +156,4 @@ If this file conflicts with `docs/SPEC.md`, `docs/ROADMAP.md`, or an applicable 
 
 ## Last Updated
 
-2026-07-22 — Updated after Task 1.3 established the experimental configuration contract and safe example validator.
+2026-07-22 — Updated after Task 1.4 completed the documentation baseline and roadmap phase transition map.
