@@ -9,7 +9,7 @@ ADR створюються лише для довготривалих архіт
 | ADR | Decision | Status | Gate / dependency |
 |---|---|---|---|
 | [ADR-0001](ADR-0001-use-smtp-to-graph-not-smtp-auth.md) | SMTP-to-Graph через application-only Graph auth | Accepted | Gate C authorization |
-| [ADR-0002](ADR-0002-select-smtp2graph-as-initial-gateway.md) | SMTP2Graph як початковий gateway candidate | Proposed | Gate B qualification |
+| [ADR-0002](ADR-0002-select-smtp2graph-as-initial-gateway.md) | SMTP2Graph v1.1.5 як початковий gateway candidate | Rejected | Gate B qualification |
 | [ADR-0003](ADR-0003-select-single-node-swarm-for-production-minimum.md) | Single-node Docker Swarm | Accepted | Gate D operational readiness |
 | [ADR-0004](ADR-0004-use-dedicated-single-sender-mailbox.md) | Одна dedicated sender mailbox | Accepted | Gate C mailbox ownership |
 | [ADR-0005](ADR-0005-restrict-graph-mail-send-to-sender-mailbox.md) | Mail.Send обмежується sender mailbox | Accepted | Gate C allowed/denied proof |

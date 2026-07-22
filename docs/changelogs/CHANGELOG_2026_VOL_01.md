@@ -85,3 +85,10 @@ Rollback:
     Verification: `make validate` і `git diff --check` виконано успішно; ADR-0002 та AI_CONTEXT не змінювалися до фактичного повторного Gate B.
     Risks: Fork створює patch maintenance і license obligations; Phase 3 залишається заблокованою до повторного Gate B без Critical gaps.
     Rollback: Відкотити roadmap decision окремою reviewed зміною; вибір іншого component потребує ADR і повного Gate B для його exact digest.
+
+2026-07-22 — Task 2.5: formal upstream Gate B rejection record
+    Context: Roadmap already selected a fork remediation path, while ADR-0002, AI context and qualification artifacts still described the rejected upstream candidate as pending.
+    Change: ADR-0002, its index, AI context, test plan and gateway-version artifact now consistently mark upstream SMTP2Graph v1.1.5 as Gate B `Rejected`. The records preserve the minimal fork as unqualified remediation only and retain the Phase 3 block.
+    Verification: Перевірено посилання та status references; `make validate` і `git diff --check` виконано успішно.
+    Risks: The selected fork still has no repository, digest, patch inventory, supply-chain evidence or repeated Gate B evidence; no production approval is implied.
+    Rollback: Revert this documentation-only record in a reviewed change only if evidence invalidates the rejection decision; do not use the upstream digest for production.

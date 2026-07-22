@@ -1,31 +1,31 @@
 # ADR-0002: Select SMTP2Graph as the initial gateway candidate
 
-- **Status:** Proposed
+- **Status:** Rejected
 - **Date:** 2026-07-22
 - **Related:** `docs/SPEC.md` sections 2, 4, 5, 14; Gate B; Tasks 2.2–2.5
 
 ## Context
 
-The project needs one maintainable SMTP-to-Graph component for the production minimum. SMTP2Graph is the initial candidate because its stated feature set includes SMTP server support, Graph relay, SMTP authentication, TLS, IP and sender allowlists, rate limiting, brute-force protection and a local queue. The v1.1.5 release and image digest are recorded as a qualification candidate. A synthetic runtime spike passed certificate-file and client-secret rendering plus non-root/read-only startup, but security and delivery evidence remains incomplete.
+The project needs one maintainable SMTP-to-Graph component for the production minimum. SMTP2Graph was the initial candidate because its stated feature set includes SMTP server support, Graph relay, SMTP authentication, TLS, IP and sender allowlists, rate limiting, brute-force protection and a local queue. The v1.1.5 release and image digest were recorded as a qualification candidate. A synthetic runtime spike passed certificate-file and client-secret rendering plus non-root/read-only startup, but the Gate B review found Critical delivery and durability defects.
 
 ## Decision
 
-Use SMTP2Graph v1.1.5 as the initial gateway candidate for qualification only, pinned to the multi-platform image digest recorded in [`deploy/config/gateway-version.md`](../../deploy/config/gateway-version.md). Keep this ADR Proposed until Gate B verifies provenance, license compatibility, signature/vulnerability/SBOM posture, secret-file compatibility, non-root/read-only behavior, queue durability, SMTP acknowledgement semantics, retry behavior, MIME handling and display-name behavior.
+Reject upstream SMTP2Graph v1.1.5, pinned to the multi-platform digest recorded in [`deploy/config/gateway-version.md`](../../deploy/config/gateway-version.md), as a production gateway component. Gate B confirmed three Critical blockers: Graph `Retry-After` is ignored; permanent Graph errors can remain in the live queue rather than atomically moving to `failed`; and SMTP `250` precedes confirmed durable queue persistence.
 
-Production implementation must not depend on SMTP2Graph until Gate B is `pass` or `conditional pass` without a Critical blocker. A failed qualification returns the component decision to review; it does not trigger production migration.
+The roadmap selects a minimal fork of the exact upstream release as a remediation path only. It is not an approved production component or a qualified candidate until it has its own immutable digest and a complete, digest-scoped Gate B review. Production implementation remains blocked.
 
 ## Alternatives Considered
 
 - Standalone Docker Compose with host-managed secrets — rejected for the production minimum because the selected baseline requires Swarm-native secret handling and controlled deployment.
-- Custom gateway — deferred due to unnecessary implementation and maintenance scope.
+- Minimal fork of exact v1.1.5 — selected as the remediation path because the three blockers are localized; it requires a new digest-scoped qualification.
+- Custom Python production minimum — fallback if the fork cannot be maintained safely; it requires a new ADR and a full Gate B.
 - Exchange Online connector relay — rejected because it does not provide the required application-only Graph boundary and client policy model.
-- A different upstream gateway — retained as a fallback if SMTP2Graph fails Gate B.
+- A different upstream gateway — retained as a fallback; it requires a full Gate B.
 
 ## Consequences
 
-- Qualification work is explicit and evidence-driven rather than an implicit component approval.
-- The candidate image reference is immutable, but it is not yet an approved production artifact; mutable tags remain prohibited for deployment.
-- The qualification wrapper writes only to container tmpfs and keeps Docker Secret files outside container environment variables; it remains a prototype until the production secret lifecycle is reviewed.
-- Task 2.4 found that the candidate ignores Graph `Retry-After` and leaves `ErrorAccessDenied` payloads in queue rather than failed state. These are Gate B blockers unless a reviewed mitigation changes the production design.
-- Gate B may reject or conditionally accept the candidate, requiring the ADR status and AI context to be updated with evidence.
-- Synthetic fixtures and isolated tenant resources are required for protocol and runtime tests.
+- Upstream v1.1.5 is prohibited as a production component; its existing digest, scan and runtime evidence cannot be transferred automatically to a fork.
+- The qualification wrapper remains a synthetic prototype and does not approve any production secret lifecycle.
+- The fork must implement and test `Retry-After`, permanent-error-to-`failed`, and durable SMTP acknowledgement behavior without MIME, BCC, UTF-8, attachment or restart regressions.
+- A successful fork review requires an immutable image digest, SBOM, vulnerability/provenance evidence, non-production Microsoft 365 checks and a new Gate B decision record.
+- Synthetic fixtures and isolated tenant resources remain required for protocol and runtime tests.

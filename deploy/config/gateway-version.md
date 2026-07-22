@@ -1,6 +1,6 @@
 # SMTP2Graph qualification candidate
 
-**Status:** Qualification incomplete; do not use for production deployment.
+**Status:** Rejected by Gate B; do not use for production deployment.
 **Date:** 2026-07-22
 **Related:** [ADR-0002](../../docs/adr/ADR-0002-select-smtp2graph-as-initial-gateway.md), Roadmap Tasks 2.2–2.5, Gate B
 
@@ -41,7 +41,7 @@ The digest was resolved from the Docker Registry manifest and then pulled by dig
 | Client-secret fallback | Preliminary pass | Task 2.3 renders a secret-file value only into tmpfs; synthetic value is absent from inspect and logs |
 | Non-root/read-only compatibility | Preliminary pass | Task 2.3 passed as UID/GID `65532:65532` with `/runtime` and `/tmp` tmpfs; the upstream image itself still has no configured `USER` |
 | Protocol/MIME/queue | Partial; blockers found | See `docs/TEST_PLAN.md`: MIME and restart pass locally, but `Retry-After`, dead-letter and acknowledgement durability are unacceptable or incomplete |
-| Gate B | Not passed | Task 2.4 found protocol blockers; Task 2.5 must reject the candidate or document an approved mitigation, alongside scan/SBOM/signature and production secret review |
+| Gate B | Rejected | Task 2.5 confirmed Critical `Retry-After`, dead-letter and acknowledgement-durability blockers. A future fork requires separate digest-scoped evidence; this upstream evidence is not transferable by default. |
 
 ## Safe reproduction commands
 

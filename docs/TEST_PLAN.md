@@ -1,6 +1,6 @@
 # SMTP2Graph qualification test plan
 
-**Status:** Gate B evidence in progress; this document does not approve production use.
+**Status:** Upstream candidate rejected by Gate B; this document is retained as evidence and does not approve production use.
 **Candidate:** SMTP2Graph v1.1.5 pinned in [`deploy/config/gateway-version.md`](../deploy/config/gateway-version.md).
 
 ## Test boundary
@@ -36,4 +36,4 @@ The protocol harness uses an isolated Docker network, generated TLS material, sy
 4. Actual Microsoft 365 display-name behavior, certificate token acquisition, final delivery and denied-mailbox behavior require a controlled non-production tenant.
 5. TCP timeout, queue state after abrupt host loss, disk threshold rejection and failed-payload retention remain future acceptance tests.
 
-These blockers keep [ADR-0002](adr/ADR-0002-select-smtp2graph-as-initial-gateway.md) in `Proposed`. Task 2.5 must record a `reject` or an approved mitigation that does not carry Critical behavior into production.
+These blockers reject upstream SMTP2Graph v1.1.5 in [ADR-0002](adr/ADR-0002-select-smtp2graph-as-initial-gateway.md). A fork may be qualified only with a new exact digest and evidence that the Critical behavior does not reach production.

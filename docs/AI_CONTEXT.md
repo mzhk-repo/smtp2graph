@@ -4,7 +4,7 @@
 
 `smtp2graph` is an infrastructure project for a private SMTP-to-Microsoft Graph gateway. It enables Grafana, Moodle, DSpace, Koha, and Matomo to send mail through Microsoft 365 while Microsoft Entra Security Defaults remain enabled. The target is a secure, maintainable production minimum, not a general-purpose mail platform.
 
-The planned initial gateway candidate is SMTP2Graph. This is not yet an accepted production component: it must pass Gate B qualification before implementation relies on it.
+Upstream SMTP2Graph v1.1.5 was the initial gateway candidate and is rejected by Gate B. A minimal fork is a remediation path only; it is not a production component until a new exact digest passes Gate B.
 
 ## Current Status
 
@@ -16,9 +16,9 @@ The planned initial gateway candidate is SMTP2Graph. This is not yet an accepted
 - Task 1.2 local quality baseline is complete. `make validate` runs pinned Markdown, YAML, and shell-format checks plus `git diff --check`; Gitleaks and ShellCheck remain CI-owned checks.
 - Task 1.3 experimental configuration contract is complete. `.env.example` contains safe development values and versioned-secret-name placeholders only; `verify-env.sh --example-only` validates the allowlisted keys without sourcing an environment file.
 - Task 1.4 documentation baseline is complete. `README.md`, `AI_CONTEXT.md`, the changelog index/active volume, roadmap documentation map, and the roadmap phase transition map are present and linked.
-- Task 2.1 ADR baseline is complete. `docs/adr/ADR-0001` through `ADR-0007` record the SMTP-to-Graph boundary, initial gateway candidate, Swarm topology, sender mailbox, Graph mailbox scope, secret boundary, and cold-recovery model. `ADR-0002` remains Proposed pending Gate B.
+- Task 2.1 ADR baseline is complete. `docs/adr/ADR-0001` through `ADR-0007` record the SMTP-to-Graph boundary, initial gateway candidate, Swarm topology, sender mailbox, Graph mailbox scope, secret boundary, and cold-recovery model. Task 2.5 rejected upstream SMTP2Graph v1.1.5 in ADR-0002; Phase 3 remains blocked pending a new fork candidate and Gate B.
 - Task 2.3 runtime compatibility spike is complete with synthetic inputs. The prototype renders configuration in tmpfs, supports certificate-file and client-secret fallback modes, and passes non-root/read-only startup, listener, stop/restart and secret-surface checks; Graph token and delivery behavior remain unqualified.
-- Task 2.4 protocol qualification is complete against an isolated token/Graph mock. MIME and queue-restart checks pass, but Graph `Retry-After` is ignored and `ErrorAccessDenied` does not move payloads to failed state; both block Gate B pending rejection or an approved mitigation.
+- Task 2.4 protocol qualification is complete against an isolated token/Graph mock. MIME and queue-restart checks pass, but Graph `Retry-After` is ignored, `ErrorAccessDenied` does not move payloads to failed state, and SMTP `250` precedes proven durable enqueue. Task 2.5 therefore rejected upstream v1.1.5.
 
 ## Key Decisions
 
@@ -50,7 +50,7 @@ The target queue is durable but bounded to 1 GiB. At 80% utilization, new SMTP s
 
 ## Tech Stack
 
-- Gateway qualification candidate: SMTP2Graph v1.1.5, immutable digest recorded in `deploy/config/gateway-version.md`; runtime compatibility spike passed, but Gate B is blocked by `Retry-After` and dead-letter behavior, plus scan/SBOM and non-production Microsoft 365 evidence.
+- Rejected upstream gateway: SMTP2Graph v1.1.5, immutable digest recorded in `deploy/config/gateway-version.md`. A minimal fork is the selected remediation path, but it has no qualified digest or production approval; it must close the three Critical Gate B blockers and supply new scan/SBOM and non-production Microsoft 365 evidence.
 - Runtime/orchestration: Docker Swarm, single node, one service replica.
 - Secrets: Docker Secrets, SOPS + age.
 - Identity and mail delivery: Microsoft Entra ID, Microsoft Graph, Exchange Online RBAC for Applications.
@@ -148,9 +148,9 @@ If this file conflicts with `docs/SPEC.md`, `docs/ROADMAP.md`, or an applicable 
 
 ## Open Questions
 
-- Does SMTP2Graph v1.1.5 pass Gate B after scan, SBOM and runtime qualification? See [ADR-0002](adr/ADR-0002-select-smtp2graph-as-initial-gateway.md) and [gateway-version.md](../deploy/config/gateway-version.md).
-- Does that release safely support certificate-file authentication and a tmpfs-rendered runtime configuration?
-- What are its exact SMTP acknowledgement, durable queue, `Retry-After`, dead-letter, and downgrade compatibility semantics?
+- What exact fork repository, upstream commit, license-obligation owner and patch owner are approved for remediation?
+- Does the fork pass Gate B with a new immutable digest, scan/SBOM/provenance evidence and non-production Microsoft 365 checks?
+- Does the fork safely support certificate-file authentication, tmpfs-rendered runtime configuration, durable SMTP acknowledgement, `Retry-After` and permanent-error-to-`failed` semantics?
 - What TLS certificate source and trust model will clients use?
 - What non-production test tenant/mailbox and recipient allowlist are available?
 - What is the final independent alert transport and who owns on-call response?
@@ -159,4 +159,4 @@ If this file conflicts with `docs/SPEC.md`, `docs/ROADMAP.md`, or an applicable 
 
 ## Last Updated
 
-2026-07-22 — Updated after Task 2.4 identified Gate B blockers in `Retry-After` and dead-letter behavior; ADR-0002 remains Proposed.
+2026-07-22 — Task 2.5 rejected upstream SMTP2Graph v1.1.5 after three Critical Gate B blockers. A minimal fork is remediation only; Phase 3 remains blocked pending a new digest-scoped Gate B.
