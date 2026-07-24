@@ -19,6 +19,7 @@ Upstream SMTP2Graph v1.1.5 was the initial gateway candidate and is rejected by 
 - Task 2.1 ADR baseline is complete. `docs/adr/ADR-0001` through `ADR-0007` record the SMTP-to-Graph boundary, initial gateway candidate, Swarm topology, sender mailbox, Graph mailbox scope, secret boundary, and cold-recovery model. Task 2.5 rejected upstream SMTP2Graph v1.1.5 in ADR-0002; Phase 3 remains blocked pending a new fork candidate and Gate B.
 - Task 2.3 runtime compatibility spike is complete with synthetic inputs. The prototype renders configuration in tmpfs, supports certificate-file and client-secret fallback modes, and passes non-root/read-only startup, listener, stop/restart and secret-surface checks; Graph token and delivery behavior remain unqualified.
 - Task 2.4 protocol qualification is complete against an isolated token/Graph mock. MIME and queue-restart checks pass, but Graph `Retry-After` is ignored, `ErrorAccessDenied` does not move payloads to failed state, and SMTP `250` precedes proven durable enqueue. Task 2.5 therefore rejected upstream v1.1.5.
+- Gateway fork integration contract is defined. The current repository remains control plane; the future `mzhk-repo/smtp2graph-gateway` build repository will own upstream source, three remediation patches and GHCR image releases. Its creation and first qualification are pending.
 
 ## Key Decisions
 
@@ -50,7 +51,8 @@ The target queue is durable but bounded to 1 GiB. At 80% utilization, new SMTP s
 
 ## Tech Stack
 
-- Rejected upstream gateway: SMTP2Graph v1.1.5, immutable digest recorded in `deploy/config/gateway-version.md`. A minimal fork is the selected remediation path, but it has no qualified digest or production approval; it must close the three Critical Gate B blockers and supply new scan/SBOM and non-production Microsoft 365 evidence.
+- Rejected upstream gateway: SMTP2Graph v1.1.5, immutable digest recorded in `deploy/config/gateway-version.md`. A minimal fork is the selected remediation path, but it has no qualified digest or production approval; it must close the three Critical Gate B blockers and supply Trivy scan/exception, Syft CycloneDX SBOM, OCI metadata and non-production Microsoft 365 evidence.
+- Fork release interface: `ghcr.io/mzhk-repo/smtp2graph-gateway` is the planned immutable image repository. The shared CI/CD workflow automatically builds, pushes and deploys `dev` to development and `main` to production when invoked by its caller; it does not yet record the three agreed Gate B supply-chain artifacts. The control plane may consume only a verified digest paired with fork source, Trivy scan/exception record, CycloneDX SBOM, OCI labels and Gate B evidence as defined in `docs/FORK_INTEGRATION.md`.
 - Runtime/orchestration: Docker Swarm, single node, one service replica.
 - Secrets: Docker Secrets, SOPS + age.
 - Identity and mail delivery: Microsoft Entra ID, Microsoft Graph, Exchange Online RBAC for Applications.
@@ -149,7 +151,9 @@ If this file conflicts with `docs/SPEC.md`, `docs/ROADMAP.md`, or an applicable 
 ## Open Questions
 
 - What exact fork repository, upstream commit, license-obligation owner and patch owner are approved for remediation?
-- Does the fork pass Gate B with a new immutable digest, scan/SBOM/provenance evidence and non-production Microsoft 365 checks?
+- When will `mzhk-repo/smtp2graph-gateway` be created and which owners may approve its protected branches, releases and GHCR packages?
+- How will the shared CI/CD workflow pass, verify and deploy the exact GHCR digest rather than mutable `main`/`dev` tags?
+- Does the fork pass Gate B with a new immutable digest, Trivy scan/exception record, CycloneDX SBOM, OCI labels and non-production Microsoft 365 checks?
 - Does the fork safely support certificate-file authentication, tmpfs-rendered runtime configuration, durable SMTP acknowledgement, `Retry-After` and permanent-error-to-`failed` semantics?
 - What TLS certificate source and trust model will clients use?
 - What non-production test tenant/mailbox and recipient allowlist are available?
@@ -159,4 +163,4 @@ If this file conflicts with `docs/SPEC.md`, `docs/ROADMAP.md`, or an applicable 
 
 ## Last Updated
 
-2026-07-22 — Task 2.5 rejected upstream SMTP2Graph v1.1.5 after three Critical Gate B blockers. A minimal fork is remediation only; Phase 3 remains blocked pending a new digest-scoped Gate B.
+2026-07-24 — Task 2.5 rejected upstream SMTP2Graph v1.1.5 after three Critical Gate B blockers. The control-plane/build-plane fork contract is synchronized with the shared CI/CD workflow: `main` deploys production and `dev` deploys development; Gate B supply-chain evidence is limited to Trivy scan/exception, Syft CycloneDX SBOM and OCI labels.

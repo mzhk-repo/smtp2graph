@@ -376,13 +376,13 @@ Implementation task готова до виконання, лише якщо:
 ### Task 2.2 — Supply-chain qualification pinned release
 
 - **Priority:** Must
-- **Goal:** вибрати exact SMTP2Graph version/digest із перевіреним provenance.
+- **Goal:** зафіксувати exact SMTP2Graph version/digest і три погоджені supply-chain evidence-артефакти.
 - **Depends on:** Task 2.1.
 - **Definition of Ready:** upstream source/image/release доступні; scan policy та severity threshold визначені.
-- **Implementation Steps:** перевірити maintenance cadence, release notes, license, source-to-image provenance; отримати/створити SBOM; запустити vulnerability scan; зафіксувати digest.
+- **Implementation Steps:** зафіксувати exact version/digest; виконати Trivy image scan exact digest і оформити Formal Exception Record для дозволеного Critical/High finding; згенерувати CycloneDX SBOM через Syft; перевірити OCI labels для source/release metadata.
 - **Files / Directories:** `deploy/config/gateway-version.*`, `tests/acceptance/`, `.github/workflows/`.
-- **Artifacts:** Gate B evidence, SBOM artifact policy, оновлений ADR-0002.
-- **Acceptance Criteria:** немає unresolved Critical/High exploitability findings; mutable tag не використовується для deployment; digest відтворювано перевіряється.
+- **Artifacts:** Gate B evidence: Trivy image scan/exception record, CycloneDX SBOM і OCI metadata record; оновлений ADR-0002.
+- **Acceptance Criteria:** Trivy scan виконано для exact digest; кожен дозволений Critical/High finding має Formal Exception Record; CycloneDX SBOM і OCI labels пов'язані з exact digest; mutable tag не використовується для deployment.
 - **Validation Commands:**
   ```bash
   docker pull "${GATEWAY_IMAGE_REF}"
@@ -390,7 +390,7 @@ Implementation task готова до виконання, лише якщо:
   trivy image --severity HIGH,CRITICAL --exit-code 1 "${GATEWAY_IMAGE_DIGEST}"
   syft "${GATEWAY_IMAGE_DIGEST}" -o cyclonedx-json
   ```
-- **Risks:** upstream image unsigned або abandoned; scanner false positives.
+- **Risks:** scanner false positives або надто широкий Formal Exception Record.
 - **Rollback Notes:** зберігати попередній approved digest; exception потребує owner і expiry.
 
 ### Task 2.3 — Runtime, secret і container compatibility spike
@@ -456,15 +456,15 @@ Implementation task готова до виконання, лише якщо:
   3. Класифікувати permanent Graph errors і атомарно переміщувати відповідні payloads із live queue до `failed` без нескінченного retry.
   4. Перенести SMTP success boundary після durable enqueue: atomic rename, `fsync` queue-файла та queue-каталогу; при помилці durability повертати temporary SMTP failure, а не `250`.
   5. Повторити protocol, MIME, BCC, UTF-8, attachment, restart, durability та failure-injection tests; окремо перевірити crash одразу після SMTP `250` і відсутність duplicate enqueue.
-  6. Виконати non-production Microsoft 365 checks, vulnerability scan, Syft SBOM і provenance review; сформувати та зафіксувати exact fork image digest.
+  6. Виконати non-production Microsoft 365 checks; для exact fork image digest виконати Trivy image scan із Formal Exception Record, створити CycloneDX SBOM через Syft і перевірити OCI labels для source/release metadata.
   7. Провести повторний architecture/security/operations review; лише після нового Gate B decision оновити ADR-0002 та `docs/AI_CONTEXT.md`.
 - **Files / Directories:** fork source repository; `docs/TEST_PLAN.md`; `deploy/config/gateway-version.md`; `docs/adr/ADR-0002-*`; `docs/AI_CONTEXT.md`; immutable Gate B evidence location.
-- **Artifacts:** upstream rejection record; fork patch inventory; test evidence; scan/SBOM artifacts; exact fork digest; повторний Gate B decision record.
+- **Artifacts:** upstream rejection record; fork patch inventory; test evidence; Trivy image scan/exception record; CycloneDX SBOM; OCI metadata record; exact fork digest; повторний Gate B decision record.
 - **Acceptance Criteria:**
   - Upstream `v1.1.5` однозначно позначений rejected candidate і не використовується як production component.
   - Fork проходить `Retry-After`, permanent-error-to-failed та durable-acknowledgement blocker scenarios.
   - MIME, BCC, UTF-8, attachments і queue restart не мають регресій.
-  - Gate B decision посилається на exact fork digest і його immutable evidence.
+  - Gate B decision посилається на exact fork digest, Trivy image scan/exception record, CycloneDX SBOM та OCI metadata record.
   - `conditional pass` заборонений, якщо будь-який із трьох Critical blocker-ів залишається відкритим.
   - Evidence upstream digest не переноситься на fork автоматично; кожен reused artifact має applicability review.
   - Phase 3 залишається заблокованою до `pass` або `conditional pass` нового candidate без Critical gaps.
@@ -476,7 +476,7 @@ Implementation task готова до виконання, лише якщо:
 
 - [ ] Upstream `v1.1.5` rejection і remediation decision approved.
 - [ ] Повторний Gate B для fork candidate approved без Critical gaps.
-- [ ] Fork version і digest pinned; SBOM/scan evidence збережені.
+- [ ] Fork version і digest pinned; Trivy image scan/exception record, CycloneDX SBOM та OCI metadata record збережені.
 - [ ] Secret, non-root/read-only, MIME, queue і acknowledgement behavior доведені.
 - [ ] ADR та AI_CONTEXT актуальні.
 

@@ -27,5 +27,5 @@ The roadmap selects a minimal fork of the exact upstream release as a remediatio
 - Upstream v1.1.5 is prohibited as a production component; its existing digest, scan and runtime evidence cannot be transferred automatically to a fork.
 - The qualification wrapper remains a synthetic prototype and does not approve any production secret lifecycle.
 - The fork must implement and test `Retry-After`, permanent-error-to-`failed`, and durable SMTP acknowledgement behavior without MIME, BCC, UTF-8, attachment or restart regressions.
-- A successful fork review requires an immutable image digest, SBOM, vulnerability/provenance evidence, non-production Microsoft 365 checks and a new Gate B decision record.
+- A successful fork review requires an immutable image digest, Trivy image scan with Formal Exception Record where needed, CycloneDX SBOM through Syft, OCI metadata labels, non-production Microsoft 365 checks and a new Gate B decision record.
 - Synthetic fixtures and isolated tenant resources remain required for protocol and runtime tests.

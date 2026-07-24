@@ -92,3 +92,24 @@ Rollback:
     Verification: Перевірено посилання та status references; `make validate` і `git diff --check` виконано успішно.
     Risks: The selected fork still has no repository, digest, patch inventory, supply-chain evidence or repeated Gate B evidence; no production approval is implied.
     Rollback: Revert this documentation-only record in a reviewed change only if evidence invalidates the rejection decision; do not use the upstream digest for production.
+
+2026-07-22 — Task 2.5: fork build-repository integration contract
+    Context: Поточний repository є control plane, а fork має окремо збирати та публікувати пропатчений gateway image у GHCR без ризику конфлікту з IaC/evidence history.
+    Change: Додано `docs/FORK_INTEGRATION.md`: межу між `mzhk-repo/smtp2graph` і майбутнім `mzhk-repo/smtp2graph-gateway`, exact upstream baseline, protected patch/upgrade flow, GHCR release interface, evidence handoff і GPL obligations. README та AI context посилаються на контракт.
+    Verification: `make validate` і `git diff --check` виконано успішно.
+    Risks: Build repository, branch protections, GHCR package, CI workflow та fork digest ще не створені; документ не є evidence повторного Gate B.
+    Rollback: При зміні repository model оновити контракт reviewed зміною; не переносити upstream image або evidence у deployment без нового Gate B.
+
+2026-07-24 — Task 2.5: shared CI/CD integration contract
+    Context: Gateway fork має використовувати reusable Swarm/SOPS workflow, де caller push у `main` автоматично deploy-ить production, а push у `dev` — development.
+    Change: `docs/FORK_INTEGRATION.md` синхронізовано з actual `workflow_call` inputs, GHCR build/push tags, automatic deploy flow, secrets і Swarm checkout. Documented digest/SBOM/provenance gaps are explicit Gate B blockers; AI context updated.
+    Verification: `make validate` і `git diff --check` виконано успішно.
+    Risks: Поточний workflow не повертає exact image digest і не створює SBOM/attestation; mutable branch tags не можна використати як deployment artifact.
+    Rollback: Повернути попередній contract reviewed зміною; не обходити digest verification або environment protection.
+
+2026-07-24 — Task 2.5: скорочений supply-chain scope Gate B
+    Context: Для fork candidate погоджено три достатні supply-chain evidence-артефакти без provenance/signature requirements.
+    Change: SPEC, roadmap, ADR-0002, gateway-version artifact, fork contract і AI context обмежують Gate B supply-chain scope до Trivy image scan exact digest із Formal Exception Record, Syft CycloneDX SBOM та OCI labels для metadata tracking. Три Critical функціональні blocker-сценарії залишаються обов'язковими.
+    Verification: `make validate` і `git diff --check` виконано успішно.
+    Risks: Відсутність provenance/signature evidence не має компенсувати функціональні або security defects; exception без owner/expiry/controls неприйнятний.
+    Rollback: Повернути додаткові supply-chain controls окремою reviewed зміною, не послаблюючи три Critical функціональні Gate B checks.

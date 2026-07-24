@@ -1,6 +1,6 @@
 # smtp2graph
 
-Приватний SMTP-to-Microsoft Graph gateway для внутрішніх сервісів. Проєкт перебуває на етапі створення repository baseline; production runtime ще не реалізований, а Gate B для SMTP2Graph ще не пройдений.
+Приватний SMTP-to-Microsoft Graph gateway для внутрішніх сервісів. Upstream SMTP2Graph v1.1.5 відхилено на Gate B; production runtime ще не реалізований. Наступним candidate буде окремий мінімальний fork лише після нової digest-scoped qualification.
 
 ## Документація
 
@@ -8,6 +8,7 @@
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — порядок реалізації та quality gates.
 - [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md) — компактний актуальний контекст.
 - [`docs/adr/README.md`](docs/adr/README.md) — індекс базових architecture/security decisions.
+- [`docs/FORK_INTEGRATION.md`](docs/FORK_INTEGRATION.md) — межа control-plane/build repositories, GHCR release contract і безпечне оновлення fork.
 - [`CHANGELOG.md`](CHANGELOG.md) — індекс томів changelog.
 
 ## Локальні prerequisites
